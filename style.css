@@ -1,0 +1,26 @@
+html, body {
+  margin: 15px;
+  padding: 0;
+  font-family: "Segoe UI", sans-serif;
+}
+canvas {
+  display: block;
+}
+
+.main {
+  width: 300px;
+}
+
+.title {
+  font-family: "monospace";
+  background-color: #0960FF;
+  color: #FFFFFF;
+}
+
+button {
+  background-color: #0960FF;
+  color: #FFFFFF;
+  height: 40px;
+  width: 80px;
+
+}
