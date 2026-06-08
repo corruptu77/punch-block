@@ -35,7 +35,8 @@ let blockData = {
   spin: [],
   colorRed: [],
   colorGreen: [],
-  colorBlue: []
+  colorBlue: [],
+  colorTransparency: []
 }
 function spawnBlocks() {
 blockData = {
@@ -47,7 +48,8 @@ blockData = {
   spin: [],
   colorRed: [],
   colorGreen: [],
-  colorBlue: []
+  colorBlue: [],
+  colorTransparency: []
 }
   for (var i = 0; i < amount+1; i ++) {
     blockData.locationX.push(Math.floor(Math.random()*canvasX));
@@ -59,6 +61,7 @@ blockData = {
     blockData.colorRed.push(Math.floor(Math.random()*256));
     blockData.colorGreen.push(Math.floor(Math.random()*256));
     blockData.colorBlue.push(Math.floor(Math.random()*256));
+    blockData.colorTransparency.push(50);
   }
 }
 
@@ -71,6 +74,8 @@ var hitStrength = 1;
 var punchRadius = 25;
 var randomness = 2.5;
 var isHighRate = false;
+var haveColors = true;
+var boxCollision = false;
 
 spawnBlocks();
 
@@ -93,9 +98,14 @@ function pickValueFromRandom() {
 function drawBlock(index) {
   strokeWeight(4);
   stroke(0);
-  fill(blockData.colorRed[index],blockData.colorGreen[index],blockData.colorBlue[index],50);
+  if (haveColors) {
+    fill(blockData.colorRed[index],blockData.colorGreen[index],blockData.colorBlue[index],blockData.colorTransparency[index]);
+  } else if (!haveColors) {
+    fill(255,255,255,0);
+  }
   calculatePosition(index);
   calculateVelocity(index);
+  calculateCollision(index);
   doWalls(index);
   var base = calculateVector(index);
   var point1 = createVector(base[0],base[1]);
@@ -181,6 +191,31 @@ function calculateVector(index) {
   var vectorY = Math.sin(calculateRadiansFromDegrees(vectorAngle)) * vectorLength;
   return [vectorX,vectorY];
 }
+function calculateCollision(index) {
+  // This is going to be a pain in the arse, for both me, and my PC
+  if (boxCollision) {
+  for (let i = 0; i < amount; i ++) {
+    if (i !== index) {
+      let blockDistance = dist(blockData.locationX[index],blockData.locationY[index],blockData.locationX[i],blockData.locationY[i]);
+      if (blockDistance<20) {
+        // Calculate velocity based off the intital velocities of the blocks, the positions and angles the two blocks are to each other, and the bounciness, then apply it to both blocks. This is going to be
+        let angle = Math.atan2(blockData.locationY[i]-blockData.locationY[index],blockData.locationX[i]-blockData.locationX[index]);
+        var totalVelocity = Math.sqrt(blockData.velocityX[index]**2+blockData.velocityY[index]**2)+Math.sqrt(blockData.velocityX[i]**2+blockData.velocityY[i]**2);
+        let velocityX = Math.cos(angle)*totalVelocity*bounciness*friction;
+        let velocityY = Math.sin(angle)*totalVelocity*bounciness*friction;
+        // add randomness so the blocks won't get stuck in the corner
+        velocityX += (Math.random()-0.5)*randomness;
+        velocityY += (Math.random()-0.5)*randomness;
+        blockData.velocityX[index] = -velocityX;
+        blockData.velocityY[index] = -velocityY;
+        blockData.velocityX[i] = velocityX;
+        blockData.velocityY[i] = velocityY;
+      }
+    }
+  }
+  }
+}
+
 function draw() {
   background(220);
   drawCursor();
@@ -188,9 +223,8 @@ function draw() {
     drawBlock(i);
     if (dist(mouseX, mouseY, blockData.locationX[i], blockData.locationY[i]) < punchRadius&&mouseIsPressed) {
   doPunch(i);
-}
+    } 
   }
-  
 }
 function calculateDegreesFromRadians(radians) {
   return radians * (180/Math.PI);
@@ -257,6 +291,32 @@ document.getElementById("resetRotation").addEventListener("click",function() {
     blockData.spin[i] = 0;
   }
 });
+document.getElementById("haveColors").addEventListener("change",function() {
+  haveColors = this.checked;
+  if (!haveColors) {
+    for (let i = 0; i < amount; i ++) {
+      blockData.colorRed[i] = 255;
+      blockData.colorGreen[i] = 255;
+      blockData.colorBlue[i] = 255;
+      blockData.colorTransparency[i] = 0;
+    }
+  } else if (haveColors) {
+    for (let i = 0; i < amount; i ++) {
+      blockData.colorRed[i] = Math.floor(Math.random()*256);
+      blockData.colorGreen[i] = Math.floor(Math.random()*256);
+      blockData.colorBlue[i] = Math.floor(Math.random()*256);
+      blockData.colorTransparency[i] = 50;
+    }
+  }
+});
+document.getElementById("boxCollision").addEventListener("change",function() {
+  boxCollision = this.checked;
+  if (!boxCollision) {
+    boxCollision = false;
+  } else if (boxCollision) {
+    boxCollision = true;
+  }
+});
 document.getElementById("highRateValues").addEventListener("click",function() {
   if (!(isHighRate)) {
     if (!confirm("Are you sure you want to set values to high rate? Your device may not handle it if you aren't careful. If the simulation crashes, click 'reset values', then 'stop the script' then 'start the script' ")) {
@@ -295,7 +355,7 @@ document.getElementById("resetValues").addEventListener("click",function() {
   hitStrength = 1;
   amount = 10;
   punchRadius = 25;
-  randomness = 2.5
+  randomness = 2.5;
   document.getElementById("gnX").textContent = gravityX;
   document.getElementById("gnY").textContent = gravityY;
   document.getElementById("fn").textContent = friction;
