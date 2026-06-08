@@ -13,12 +13,12 @@ canvas {
 
 .title {
   font-family: "monospace";
-  background-color: #0960FF;
+  background-color: #00DFFF;
   color: #FFFFFF;
 }
 
 button {
-  background-color: #0960FF;
+  background-color: #00DFFF;
   color: #FFFFFF;
   height: 40px;
   width: 80px;
