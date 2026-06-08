@@ -204,8 +204,8 @@ function calculateCollision(index) {
         let velocityX = Math.cos(angle)*totalVelocity*bounciness*friction;
         let velocityY = Math.sin(angle)*totalVelocity*bounciness*friction;
         // add randomness so the blocks won't get stuck in the corner
-        velocityX += (Math.random()-0.5)*randomness;
-        velocityY += (Math.random()-0.5)*randomness;
+        velocityX += (Math.random()-0.5)*pickValueFromRandom;
+        velocityY += (Math.random()-0.5)*pickValueFromRandom;
         blockData.velocityX[index] = -velocityX;
         blockData.velocityY[index] = -velocityY;
         blockData.velocityX[i] = velocityX;
