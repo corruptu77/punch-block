@@ -32,7 +32,10 @@ let blockData = {
   rotation: [],
   velocityX: [],
   velocityY: [],
-  spin: []
+  spin: [],
+  colorRed: [],
+  colorGreen: [],
+  colorBlue: []
 }
 function spawnBlocks() {
 blockData = {
@@ -41,7 +44,10 @@ blockData = {
   rotation: [],
   velocityX: [],
   velocityY: [],
-  spin: []
+  spin: [],
+  colorRed: [],
+  colorGreen: [],
+  colorBlue: []
 }
   for (var i = 0; i < amount+1; i ++) {
     blockData.locationX.push(Math.floor(Math.random()*canvasX));
@@ -50,6 +56,9 @@ blockData = {
     blockData.velocityX.push(0);
     blockData.velocityY.push(0);
     blockData.spin.push(0);
+    blockData.colorRed.push(Math.floor(Math.random()*256));
+    blockData.colorGreen.push(Math.floor(Math.random()*256));
+    blockData.colorBlue.push(Math.floor(Math.random()*256));
   }
 }
 
@@ -84,7 +93,7 @@ function pickValueFromRandom() {
 function drawBlock(index) {
   strokeWeight(4);
   stroke(0);
-  noFill();
+  fill(blockData.colorRed[index],blockData.colorGreen[index],blockData.colorBlue[index],50);
   calculatePosition(index);
   calculateVelocity(index);
   doWalls(index);
